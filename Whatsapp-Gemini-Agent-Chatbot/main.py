@@ -49,7 +49,6 @@ def webhook():
                 print(f"📨 From {sender_id}: {text}")
 
                 gemini_reply = ask_gemini(text)
-
                 send_whatsapp_text(sender_id, gemini_reply)
             else:
                 print("ℹ️ Skipped non-message event")
@@ -58,6 +57,8 @@ def webhook():
             print("❌ Error in POST handler:", e)
 
         return jsonify({'status': 'received'}), 200
+
+    return 'Method not allowed', 405
 
 
 @app.route('/health', methods=['GET'])
