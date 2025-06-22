@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 import requests
-from google import genai  # <-- Gemini Python SDK
+from google import genai  
 from dotenv import load_dotenv
 import os
 
@@ -8,21 +8,15 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# 🔐 WhatsApp Business API credentials
+
 ACCESS_TOKEN = os.getenv('ACCESS_TOKEN')
 PHONE_NUMBER_ID = os.getenv('PHONE_NUMBER_ID')
 WHATSAPP_API_URL = f'https://graph.facebook.com/v22.0/{PHONE_NUMBER_ID}/messages'
-
-# 🔑 Gemini SDK setup
-
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
-
-# ✅ Webhook verification token
 VERIFY_TOKEN = os.getenv('VERIFY_TOKEN')
-
 MAX_WHATSAPP_TEXT_LENGTH = int(os.getenv('MAX_WHATSAPP_TEXT_LENGTH', 4096))
 
-# 📩 Webhook route
+
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
     if request.method == 'GET':
@@ -54,10 +48,8 @@ def webhook():
 
                 print(f"📨 From {sender_id}: {text}")
 
-                # 💬 Ask Gemini
                 gemini_reply = ask_gemini(text)
 
-                # 📤 Send back to WhatsApp
                 send_whatsapp_text(sender_id, gemini_reply)
             else:
                 print("ℹ️ Skipped non-message event")
@@ -67,7 +59,11 @@ def webhook():
 
         return jsonify({'status': 'received'}), 200
 
-# 🧠 Ask Gemini (SDK Version)
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    return "✅ Whatsapp Chatbot agent is alive", 200
+
 def ask_gemini(prompt):
     try:
         client = genai.Client(api_key=GEMINI_API_KEY)
@@ -79,8 +75,6 @@ def ask_gemini(prompt):
     except Exception as e:
         print("❌ Gemini Client Error:", e)
         return "Sorry, I couldn't generate a response right now."
-
-# 📤 Send WhatsApp message
 
 def send_whatsapp_text(to, message):
     try:
@@ -104,6 +98,6 @@ def send_whatsapp_text(to, message):
         print("❌ Error sending WhatsApp message:", e)
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 8000))  # Use PORT from env, default to 8000
+    port = int(os.environ.get("PORT", 8000))  
     app.run(host="0.0.0.0", port=port, debug=True)
 
