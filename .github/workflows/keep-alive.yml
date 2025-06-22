@@ -1,0 +1,14 @@
+name: 🔄 Keep whatsapp chatbot agent Backend Alive
+
+on:
+  schedule:
+    - cron: "*/3 * * * *"  # ⏱ Every 3 minutes
+  workflow_dispatch:       # ▶️ Manual trigger if needed
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛎️ Ping Render App Homepage
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" https://agents-tqj2.onrender.com/
