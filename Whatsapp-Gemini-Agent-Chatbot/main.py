@@ -20,7 +20,7 @@ GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 # ✅ Webhook verification token
 VERIFY_TOKEN = os.getenv('VERIFY_TOKEN')
 
-MAX_WHATSAPP_TEXT_LENGTH = os.getenv('MAX_WHATSAPP_TEXT_LENGTH')
+MAX_WHATSAPP_TEXT_LENGTH = int(os.getenv('MAX_WHATSAPP_TEXT_LENGTH', 4096))
 
 # 📩 Webhook route
 @app.route('/webhook', methods=['GET', 'POST'])
@@ -83,23 +83,25 @@ def ask_gemini(prompt):
 # 📤 Send WhatsApp message
 
 def send_whatsapp_text(to, message):
-    if len(message) > MAX_WHATSAPP_TEXT_LENGTH:
-        message = message[:MAX_WHATSAPP_TEXT_LENGTH - 3] + "..."
-    headers = {
-        'Authorization': f'Bearer {ACCESS_TOKEN}',
-        'Content-Type': 'application/json'
-    }
-    payload = {
-        "messaging_product": "whatsapp",
-        "to": to,
-        "type": "text",
-        "text": {
-            "body": message
-        }
-    }
-    response = requests.post(WHATSAPP_API_URL, headers=headers, json=payload)
-    print("✅ WhatsApp Response:", response.status_code, response.text)
+    try:
+        if len(message) > MAX_WHATSAPP_TEXT_LENGTH:
+            message = message[:MAX_WHATSAPP_TEXT_LENGTH - 3] + "..."
 
+        headers = {
+            'Authorization': f'Bearer {ACCESS_TOKEN}',
+            'Content-Type': 'application/json'
+        }
+        payload = {
+            "messaging_product": "whatsapp",
+            "to": to,
+            "type": "text",
+            "text": {"body": message}
+        }
+
+        response = requests.post(WHATSAPP_API_URL, headers=headers, json=payload)
+        print("✅ WhatsApp Response:", response.status_code, response.text)
+    except Exception as e:
+        print("❌ Error sending WhatsApp message:", e)
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8000))  # Use PORT from env, default to 8000
