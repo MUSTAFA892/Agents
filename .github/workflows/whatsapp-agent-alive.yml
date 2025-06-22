@@ -2,7 +2,7 @@ name: 🔄 Keep Whatsapp Chatbot Agent Alive
 
 on:
   schedule:
-    - cron: "*/3 * * * *"  # Every 3 minutes
+    - cron: "*/1 * * * *"  
   workflow_dispatch:
 
 jobs:
