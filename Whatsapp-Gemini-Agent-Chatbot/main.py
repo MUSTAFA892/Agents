@@ -77,6 +77,7 @@ def send_whatsapp_text(to, message):
     response = requests.post(WHATSAPP_API_URL, headers=headers, json=payload)
     print("WhatsApp Response:", response.status_code, response.text)
 
-
 if __name__ == '__main__':
-    app.run(port=8000, debug=True)
+    port = int(os.environ.get("PORT", 8000))  # Use PORT from env, default to 8000
+    app.run(host="0.0.0.0", port=port, debug=True)
+
